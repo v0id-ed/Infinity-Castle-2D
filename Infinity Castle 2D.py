@@ -291,9 +291,21 @@ def main():
             timer_text = f"Time: {elapsed}s"
             draw_text_with_outline(timer_text, font, RED, WHITE, SCREEN_WIDTH//2 - font.size(timer_text)[0]//2, 10, screen)
 
-            # Rank S if <=10s
-            if state == "muzan_defeated" and final_time is not None and final_time <= 10:
+            # Ranks
+            if state == "muzan_defeated" and final_time is not None and final_time <= 180:
                 rank_text = "Rank: S"
+                draw_text_with_outline(rank_text, large_font, RED, WHITE, SCREEN_WIDTH//2 - large_font.size(rank_text)[0]//2, 50, screen)
+            elif state == "muzan_defeated" and final_time is not None and final_time <= 240:
+                rank_text = "Rank: A"
+                draw_text_with_outline(rank_text, large_font, RED, WHITE, SCREEN_WIDTH//2 - large_font.size(rank_text)[0]//2, 50, screen)
+            elif state == "muzan_defeated" and final_time is not None and final_time <= 360:
+                rank_text = "Rank: B"
+                draw_text_with_outline(rank_text, large_font, RED, WHITE, SCREEN_WIDTH//2 - large_font.size(rank_text)[0]//2, 50, screen)
+            elif state == "muzan_defeated" and final_time is not None and final_time <= 420:
+                rank_text = "Rank: C"
+                draw_text_with_outline(rank_text, large_font, RED, WHITE, SCREEN_WIDTH//2 - large_font.size(rank_text)[0]//2, 50, screen)
+            elif state == "muzan_defeated" and final_time is not None and final_time >= 540:
+                rank_text = "Rank: D"
                 draw_text_with_outline(rank_text, large_font, RED, WHITE, SCREEN_WIDTH//2 - large_font.size(rank_text)[0]//2, 50, screen)
 
             fog=pygame.Surface((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.SRCALPHA)
