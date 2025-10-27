@@ -1,3 +1,5 @@
+This is a game based off the Infinity Castle in Demon Slayer.
+
 Reach 12000 Kimetsu Points to beat Muzan!
 
 Rank S: beat Muzan within 3 minutes,
