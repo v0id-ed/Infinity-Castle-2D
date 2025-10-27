@@ -1,6 +1,6 @@
 This is a game based off the Infinity Castle in Demon Slayer.
 
-Reach 12000 Kimetsu Points to beat Muzan!
+Each cube you collect gives 50, 100, or 150 Kimetsu Points at random. Reach 12000 Kimetsu Points to beat Muzan!
 
 Rank S: beat Muzan within 3 minutes,
 Rank A: beat Muzan within 4 minutes,
