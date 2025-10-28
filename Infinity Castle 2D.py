@@ -18,9 +18,9 @@ player_size = 32
 player_speed = 5
 
 # Colors
-FLOOR_COLOR = (139, 0, 0)      # dark red base
-STAIR_COLOR = (255, 69, 0)     # orangish red
-WALL_BROWNS = [(139, 69, 19), (160, 82, 45), (101, 67, 33)]  # limited shades
+FLOOR_COLOR = (139, 0, 0)
+STAIR_COLOR = (255, 69, 0)
+WALL_BROWNS = [(139, 69, 19), (160, 82, 45), (101, 67, 33)]
 
 # Load player and enemy icons
 player_icon = pygame.image.load("Tanjiro.jpg")
@@ -44,47 +44,35 @@ pygame.display.set_caption("Infinity Castle 2D")
 font = pygame.font.Font(None, 36)
 large_font = pygame.font.Font(None, 48)
 
-# Player and game state
 player_x = 0
 player_y = 0
 player_floor = 0
 kimetsu_points = 0
 
-# Stair portal tracking
 stair_portal_x = None
 stair_portal_y = None
 floor_changed = False
 
-# Muzan state
 muzan_x = 0
 muzan_y = 0
 muzan_floor = 0
 muzan_health = 12000
 muzan_active = False
 
-# Maps and per-run seed
 castle_map = {}
 orange_cubes_map = {}
 twist_offset = 0
-game_seed = None  # set per run
-
-# Keep track of collected tiles
+game_seed = None
 collected_set = set()
 
-# Stopwatch
 start_time = None
-final_time = None  # freezes when win/lose
+final_time = None
 
 
 def get_tile(x, y, floor):
-    """
-    Deterministic per-run tile generation.
-    Uses game_seed so clearing castle_map + changing game_seed produces a fresh layout each run.
-    """
     global castle_map, game_seed
     if (x, y, floor) not in castle_map:
         if game_seed is None:
-            # fallback: initialize if missing (shouldn't normally happen)
             local_seed = f"default-{x},{y},{floor}"
         else:
             local_seed = f"{game_seed}-{x},{y},{floor}"
@@ -92,13 +80,13 @@ def get_tile(x, y, floor):
 
         r = rng.random()
         if r < 0.1:
-            tile_type = 1  # Wall
+            tile_type = 1
             floor_color = rng.choice(WALL_BROWNS)
         elif r < 0.12:
-            tile_type = 2  # Stair
+            tile_type = 2
             floor_color = None
         else:
-            tile_type = 0  # Floor
+            tile_type = 0
             r_shift = rng.randint(-15, 15)
             g_shift = rng.randint(-5, 5)
             b_shift = rng.randint(-5, 5)
@@ -112,10 +100,6 @@ def get_tile(x, y, floor):
 
 
 def get_collectible(x, y, floor):
-    """
-    Deterministic per-run collectible generator.
-    Uses game_seed so collectibles are stable within a run, but different runs will have different placements.
-    """
     global collected_set, game_seed
     if (x, y, floor) in collected_set:
         return None
@@ -124,7 +108,7 @@ def get_collectible(x, y, floor):
     else:
         seed_str = f"{game_seed}-coll-{x},{y},{floor}"
     rng = random.Random(seed_str)
-    if rng.random() < 0.05:  # 5% chance of collectible
+    if rng.random() < 0.05:
         return rng.choice([50, 100, 150])
     return None
 
@@ -147,7 +131,7 @@ def draw_floor(offset_x, offset_y, floor):
     tiles_w = SCREEN_WIDTH // TILE_SIZE + 3
     tiles_h = SCREEN_HEIGHT // TILE_SIZE + 3
     time_ms = pygame.time.get_ticks()
-    pulse = (math.sin(time_ms * 0.005) + 1) / 2  # 0 to 1
+    pulse = (math.sin(time_ms * 0.005) + 1) / 2
 
     for y in range(start_y, start_y + tiles_h):
         for x in range(start_x, start_x + tiles_w):
@@ -159,7 +143,6 @@ def draw_floor(offset_x, offset_y, floor):
             if tile_type == 1:
                 pygame.draw.rect(screen, floor_color, rect)
 
-                # Determine orange cube presence deterministically per-run (no flicker across frames)
                 if (x, y, floor) not in orange_cubes_map:
                     if game_seed is None:
                         orange_seed = f"default-orange-{x},{y},{floor}"
@@ -192,7 +175,6 @@ def update_muzan():
 
     if floor_changed:
         muzan_floor = player_floor
-        # place muzan at a random-but-run-dependent spot on the same floor
         if game_seed is None:
             rng = random.Random()
         else:
@@ -207,16 +189,13 @@ def reset_game():
     global stair_portal_x, stair_portal_y, floor_changed, collected_set, start_time, final_time
     global castle_map, orange_cubes_map, game_seed
 
-    # new per-run seed so layout / collectibles / orange cubes differ each run
     game_seed = random.getrandbits(64)
-
     player_x = 0
     player_y = 0
     player_floor = 0
     kimetsu_points = 0
     collected_set = set()
 
-    # Reset procedural caches for a fresh layout and orange cube distribution
     castle_map = {}
     orange_cubes_map = {}
 
@@ -230,8 +209,6 @@ def reset_game():
     stair_portal_x = stair_portal_y = None
     floor_changed = False
     state = "game"
-
-    # start stopwatch
     start_time = pygame.time.get_ticks()
     final_time = None
 
@@ -249,10 +226,8 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                # Start a new run from intro
                 if state == "intro" and event.key == pygame.K_RETURN:
                     reset_game()
-                # Immediate restart on enter from game over / win
                 elif state in ["game_over", "muzan_defeated"] and event.key == pygame.K_RETURN:
                     reset_game()
 
@@ -282,11 +257,9 @@ def main():
                 if new_floor != player_floor:
                     floor_changed = True
                     player_floor = new_floor
-                    # keep player at portal position (avoid overlap issues)
                     player_x = stair_portal_x
                     player_y = stair_portal_y
 
-            # Check for collectible pickup
             px = round(player_x / TILE_SIZE)
             py = round(player_y / TILE_SIZE)
             val = get_collectible(px, py, player_floor)
@@ -311,7 +284,6 @@ def main():
             offset_x = player_x - SCREEN_WIDTH // 2
             offset_y = player_y - SCREEN_HEIGHT // 2
 
-        # Draw
         screen.fill(BLACK if state == "game_over" else (30, 0, 30))
         if state == "intro":
             screen.blit(image, (0, 0))
@@ -321,8 +293,6 @@ def main():
         elif state == "game" or state == "muzan_defeated":
             draw_floor(offset_x, offset_y, player_floor)
 
-            # Draw collectibles procedurally around player
-            # (search window can be adjusted for performance)
             for dy in range(-10, 11):
                 for dx in range(-10, 11):
                     tx = (player_x // TILE_SIZE) + dx
@@ -345,17 +315,16 @@ def main():
             draw_text_with_outline("Kimetsu Points:", font, RED, WHITE, SCREEN_WIDTH - 240, 10, screen)
             draw_text_with_outline(str(kimetsu_points), font, RED, WHITE, SCREEN_WIDTH - 240, 10 + font.get_height(), screen)
 
-            # Stopwatch (frozen when final_time is set)
+            # Timer with milliseconds
             if start_time is not None and final_time is None:
-                elapsed = (pygame.time.get_ticks() - start_time) // 1000
+                elapsed_ms = pygame.time.get_ticks() - start_time
             else:
-                elapsed = final_time if final_time is not None else 0
-            timer_text = f"Time: {elapsed}s"
+                elapsed_ms = final_time * 1000 if final_time is not None else 0
+            elapsed_seconds = elapsed_ms / 1000.0
+            timer_text = f"Time: {elapsed_seconds:.2f}s"
             draw_text_with_outline(timer_text, font, RED, WHITE, SCREEN_WIDTH // 2 - font.size(timer_text)[0] // 2, 10, screen)
 
-            # Ranks (show only on muzan_defeated)
             if state == "muzan_defeated" and final_time is not None:
-                # example tiers (customize as you like)
                 if final_time <= 180:
                     rank_text = "Rank: S"
                 elif final_time <= 240:
