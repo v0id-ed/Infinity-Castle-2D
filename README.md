@@ -1,4 +1,4 @@
-This is a game based off the Infinity Castle in Demon Slayer. Requires Python 3 and pygame.
+This is a game based off the Infinity Castle in Demon Slayer. Requires Python 3 and pygame installed
 
 Each cube you collect gives 50, 100, or 150 Kimetsu Points at random. Reach 12000 Kimetsu Points to beat Muzan!
 
