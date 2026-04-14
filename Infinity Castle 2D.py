@@ -35,6 +35,7 @@ player_speed = 5
 # PIXEL FONT SETUP
 # =========================
 FONT_PATH = "PixeloidSans.ttf"
+small_font = pygame.font.Font(FONT_PATH, 24)
 font = pygame.font.Font(FONT_PATH, 36)
 large_font = pygame.font.Font(FONT_PATH, 48)
 super_large_font = pygame.font.Font(FONT_PATH, 60)
@@ -337,7 +338,7 @@ def main():
             draw_floor(offset_x, offset_y, player_floor)
 
             # =========================
-            # COLLECTIBLE RENDERING (restored from original script)
+            # COLLECTIBLE RENDERING
             # =========================
             for dy in range(-10, 11):
                 for dx in range(-10, 11):
@@ -349,10 +350,21 @@ def main():
                         screen_x = tx * TILE_SIZE - offset_x
                         screen_y = ty * TILE_SIZE - offset_y
                         pygame.draw.rect(screen, (255, 255, 0), (screen_x, screen_y, cube_size, cube_size))
+
             screen.blit(player_icon, (player_x - offset_x, player_y - offset_y))
 
-            if muzan_active:
+            if muzan_active and muzan_floor == player_floor:
                 screen.blit(muzan_icon, (muzan_x - offset_x, muzan_y - offset_y))
+                health_text = f"Health: {muzan_health}"
+                draw_text_with_outline(
+                    health_text,
+                    small_font,
+                    RED,
+                    BLACK,
+                    muzan_x - offset_x,
+                    muzan_y - offset_y - 25,
+                    screen
+                )
 
             draw_text_with_outline(f"Floor: {player_floor}", font, RED, WHITE, 120, 30, screen)
             draw_text_with_outline(f"Points: {kimetsu_points}", font, RED, WHITE, SCREEN_WIDTH - 150, 30, screen)
