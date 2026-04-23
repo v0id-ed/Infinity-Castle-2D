@@ -84,9 +84,6 @@ collectible_map = {}
 twist_offset = 0
 game_seed = None
 
-start_time = None
-final_time = None
-
 
 # =========================
 # CENTERED PIXEL TEXT
@@ -253,9 +250,6 @@ def reset_game():
     muzan_y = int(math.sin(angle) * distance)
     muzan_floor = 0
     muzan_active = True
-
-    start_time = pygame.time.get_ticks()
-    final_time = None
     state = "game"
 
 
@@ -315,8 +309,7 @@ def main():
                 update_muzan()
 
             if abs(player_x - muzan_x) < player_size and abs(player_y - muzan_y) < player_size:
-                final_time = (pygame.time.get_ticks() - start_time) // 1000
-                if kimetsu_points >= 12000:
+                if kimetsu_points >= 50:
                     state = "muzan_defeated"
                 else:
                     state = "game_over"
@@ -354,23 +347,37 @@ def main():
             screen.blit(player_icon, (player_x - offset_x, player_y - offset_y))
 
             if muzan_active and muzan_floor == player_floor:
-                screen.blit(muzan_icon, (muzan_x - offset_x, muzan_y - offset_y))
-                health_text = f"Health: {muzan_health}"
-                draw_text_with_outline(
-                    health_text,
-                    small_font,
-                    RED,
-                    BLACK,
-                    muzan_x - offset_x,
-                    muzan_y - offset_y - 25,
-                    screen
-                )
+                mx = muzan_x - offset_x
+                my = muzan_y - offset_y
+
+                if state == "muzan_defeated":
+                    # Split sprite into top and bottom halves
+                    w, h = muzan_icon.get_size()
+
+                    top_half = muzan_icon.subsurface((0, 0, w, h // 2))
+                    bottom_half = muzan_icon.subsurface((0, h // 2, w, h // 2))
+
+                    # small separation animation
+                    split_offset = 15
+
+                    screen.blit(top_half, (mx, my - split_offset))
+                    screen.blit(bottom_half, (mx, my + h // 2 + split_offset))
+                else:
+                    screen.blit(muzan_icon, (mx, my))
+
+                    health_text = f"Health: {muzan_health}"
+                    draw_text_with_outline(
+                        health_text,
+                        small_font,
+                        RED,
+                        BLACK,
+                        mx,
+                        my - 25,
+                        screen
+                    )
 
             draw_text_with_outline(f"Floor: {player_floor}", font, RED, WHITE, 120, 30, screen)
             draw_text_with_outline(f"Points: {kimetsu_points}", font, RED, WHITE, SCREEN_WIDTH - 150, 30, screen)
-
-            elapsed = ((pygame.time.get_ticks() - start_time) / 1000.0) if start_time else 0
-            draw_text_with_outline(f"Time: {elapsed:.2f}s", font, RED, WHITE, SCREEN_WIDTH // 2, 30, screen)
 
         if state == "game_over":
             draw_text_with_outline("YOU DIED", large_font, RED, WHITE, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50, screen)
