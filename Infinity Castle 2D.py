@@ -309,7 +309,7 @@ def main():
                 update_muzan()
 
             if abs(player_x - muzan_x) < player_size and abs(player_y - muzan_y) < player_size:
-                if kimetsu_points >= 50:
+                if kimetsu_points >= 12000:
                     state = "muzan_defeated"
                 else:
                     state = "game_over"
